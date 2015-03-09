@@ -23,10 +23,12 @@ struct Bat
 	sf::Vector2f pos;
 	sf::Vector2f speed;
 	
+	bool ai;
+	
 	float win_w;
 	float win_h;
 	
-	public: void setup(float win_w, float win_h, int position)
+	public: void setup(float win_w, float win_h, int position, bool ai = false)
 	{
 		//Create the rectangle
 		this->rect = sf::RectangleShape(sf::Vector2f(4.0, 64.0));
@@ -38,6 +40,8 @@ struct Bat
 		this->win_w = win_w;
 		this->win_h = win_h;
 		
+		this->ai = ai;
+		
 		//If position is 0, it's on the left. If it's 1, it's on the right
 		if (position)
 			this->pos = sf::Vector2f(win_w - this->rect.getSize().x, win_h / 2 - this->rect.getSize().y / 2);
@@ -45,7 +49,7 @@ struct Bat
 			this->pos = sf::Vector2f(0.0f, win_h / 2 - this->rect.getSize().y / 2);
 	}
 	
-	public: void step()
+	public: void step(float bally)
 	{
 		//Slow the bat down
 		this->speed.x /= 1.2;
@@ -64,6 +68,19 @@ struct Bat
 			this->pos.y = min_y;
 		if (this->pos.y > max_y)
 			this->pos.y = max_y;
+		
+		if (this->ai)
+		{
+			if (bally > this->pos.y + this->rect.getSize().y / 2 - 16)
+			{
+				this->speed.y += 0.9;
+			}
+		
+			if (bally < this->pos.y + this->rect.getSize().y / 2 + 16)
+			{
+				this->speed.y -= 0.9;
+			}
+		}
 		
 		//Update the bat's rectangle with the position
 		this->rect.setPosition(this->pos);
@@ -177,7 +194,7 @@ int main()
 
 	//Create the left bat
 	Bat bat_l;
-	bat_l.setup(window.getSize().x, window.getSize().y, 0);
+	bat_l.setup(window.getSize().x, window.getSize().y, 0, true);
 	
 	//Create the right bat
 	Bat bat_r;
@@ -212,7 +229,7 @@ int main()
 			ball[count].step(bat_l, bat_r, points[0], points[1]);
 		
 		//-----BAT LEFT-----
-		bat_l.step();
+		bat_l.step(ball[0].pos.y + ball[0].circle.getRadius());
 		
 		//Get keyboard
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
@@ -221,7 +238,7 @@ int main()
 			bat_l.speed.y += 1;
 		
 		//-----BAT RIGHT-----
-		bat_r.step();
+		bat_r.step(ball[0].pos.y + ball[0].circle.getRadius());
 		
 		//Get keyboard
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
