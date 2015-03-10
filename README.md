@@ -13,3 +13,7 @@ I'm still learning, so ignore the plethora of bad-practise things.
 ## Run
 
 `make run`
+
+## Trivia
+
+Compiles on both OSX and Linux, provided you have the dependencies installed.
